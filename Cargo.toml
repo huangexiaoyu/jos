@@ -1,0 +1,10 @@
+[package]
+name = "rust-jos"
+version = "1.0.0"
+authors = ["Dong Zhou"]
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+rlibc = "0.1.4"
