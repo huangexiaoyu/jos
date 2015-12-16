@@ -1,7 +1,9 @@
 .text
 
-.global start
+.align 4
 
+.global start
 start:
-        movl $0x2f4b2f4f, ($0xb8000)
-spin:   jmp spin
+        .code32                         # Assemble for 32-bit mode
+        movl $0x2f4b2f4f, (0xb8000)
+        hlt

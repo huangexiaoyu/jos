@@ -4,7 +4,7 @@
 
 # The Multiboot2 header
 
-.multiboot_header:
+.section .multiboot_header, "a"
 header_start:   
     .long   MULTIBOOT2_HEADER_MAGIC     # Magic number (multiboot 2)
     .long   0                           # Architectrure (protected mode i386)

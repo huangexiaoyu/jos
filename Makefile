@@ -12,7 +12,7 @@ image := $(OBJDIR)/kernel.iso
 KERN_ASMFILES :=	src/entry.S \
 					src/multiboot.S
 
-KERN_OBJFILES := $(patsubst src/%.S, $(OBJDIR)/%.o, $(KERN_SRCFILES))
+KERN_OBJFILES := $(patsubst src/%.S, $(OBJDIR)/%.o, $(KERN_ASMFILES))
 
 .PHONY: all clean qemu
 
@@ -39,4 +39,4 @@ $(kernel): $(KERN_OBJFILES) src/kernel.ld
 $(OBJDIR)/%.o: src/%.S
 	@echo + as $@
 	@mkdir -p $(@D)
-	$(CC) -nostdinc $(CLFAGS) -c -o $@ $<
+	$(CC) -nostdinc $(CFLAGS) -c -o $@ $<

@@ -5,10 +5,10 @@ SECTIONS
     . = 1M;
 
     .boot : {
-        *(.multiboot)    
+        *multiboot.o(.multiboot_header)    
     }
 
     .text : {
-        *(.text)
+        *entry.o(.text)
     }
 }
