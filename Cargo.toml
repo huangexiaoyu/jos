@@ -1,5 +1,5 @@
 [package]
-name = "rust-jos"
+name = "jos"
 version = "1.0.0"
 authors = ["Dong Zhou"]
 

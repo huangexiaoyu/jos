@@ -1,11 +1,14 @@
 OBJDIR := obj
 
+GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
 CC := gcc
 LD := ld
 
 CFLAGS := $(CFLAGS) -I include
 
 arch := x86_64
+target := $(arch)-unknown-linux-gnu
+jos := target/$(target)/debug/libjos.a
 kernel := $(OBJDIR)/kernel
 image := $(OBJDIR)/kernel.iso
 
@@ -21,8 +24,19 @@ all: $(image)
 clean:
 	rm -rf $(OBJDIR)
 
+QEMUOPTS = -drive format=raw,file=$(image) -gdb tcp::$(GDBPORT) -no-reboot
+
 qemu: $(image)
-	@qemu-system-x86_64 -drive format=raw,file=$(image)
+	@qemu-system-x86_64 $(QEMUOPTS)
+
+qemu-gdb: $(image)
+	@qemu-system-x86_64 $(QEMUOPTS) -S
+
+.gdbinit: .gdbinit.tmpl
+	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
+
+gdb: .gdbinit
+	gdb -x .gdbinit
 
 $(image): $(kernel) src/grub.cfg
 	@echo + mk $@
@@ -32,9 +46,12 @@ $(image): $(kernel) src/grub.cfg
 	@grub-mkrescue -o $@ $(OBJDIR)/image 2> /dev/null
 	@rm -rf $(OBJDIR)/image
 
-$(kernel): $(KERN_OBJFILES) src/kernel.ld
+$(kernel): cargo $(jos) $(KERN_OBJFILES) src/kernel.ld
 	@echo + ld $@
-	$(LD) -o $@ -n -T src/kernel.ld $(KERN_OBJFILES)
+	$(LD) -o $@ -n --gc-sections -T src/kernel.ld $(KERN_OBJFILES) $(jos)
+
+cargo:
+	@cargo build --target $(target)
 
 $(OBJDIR)/%.o: src/%.S
 	@echo + as $@
