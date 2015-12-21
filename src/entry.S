@@ -3,7 +3,7 @@
 
     .text
     .global start
-start: 
+start:
     .code32
     movl    $boot_stack_end, %esp
 
@@ -27,7 +27,7 @@ start:
  */
     movl    $pgtable, %edi
     xorl    %eax, %eax
-    movl    $((4096*6)/4), %ecx
+    movl    $((4096*3)/4), %ecx
     rep     stosl
 
     /* Build the top level page table - PML4 */
@@ -81,6 +81,7 @@ start64:
     movl    %eax, %fs
     movl    %eax, %gs
 
+    movl    %ebx, %edi
     call    kmain
 
     movq    $0x2f592f412f4b2f4f, %rax
@@ -89,22 +90,21 @@ start64:
 
     .data
 gdt:
-	.quad	0x0000000000000000	/* NULL descriptor */
-	.quad	0x00209a0000000000	/* __KERNEL_CS */
-	.quad	0x0000910000000000	/* __KERNEL_DS */
+    .quad	0x0000000000000000	/* NULL descriptor */
+    .quad	0x00209a0000000000	/* __KERNEL_CS */
+    .quad	0x0000910000000000	/* __KERNEL_DS */
 
-gdtdesc:    
+gdtdesc:
     .word   0x17
     .quad   gdt
-    
+
     .bss
     .balign 4
-boot_stack: 
+boot_stack:
     .fill   0x4000, 1, 0
-boot_stack_end: 
+boot_stack_end:
 
     .section ".pgtable", "a", @nobits
     .balign 4096
 pgtable:
-    .fill   6*4096, 1, 0
-
+    .fill   3*4096, 1, 0

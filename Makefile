@@ -32,7 +32,7 @@ qemu: $(image)
 qemu-gdb: $(image)
 	@qemu-system-x86_64 $(QEMUOPTS) -S
 
-.gdbinit: .gdbinit.tmpl
+.gdbinit:
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
 
 gdb: .gdbinit
@@ -51,7 +51,7 @@ $(kernel): cargo $(jos) $(KERN_OBJFILES) src/kernel.ld
 	$(LD) -o $@ -n --gc-sections -T src/kernel.ld $(KERN_OBJFILES) $(jos)
 
 cargo:
-	@cargo build --target $(target)
+	@cargo rustc --target $(target) -- -Z no-landing-pads
 
 $(OBJDIR)/%.o: src/%.S
 	@echo + as $@
